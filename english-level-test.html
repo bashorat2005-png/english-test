@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>English Level Test</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#F5F2EB;--card:#FFFFFF;--ink:#1A1814;--ink2:#6B6560;--ink3:#A8A39E;
+    --accent:#2D6A4F;--accent2:#52B788;--accent-light:#D8F3DC;
+    --warn:#C9184A;--warn-light:#FFE5EC;--border:#E8E4DC;
+    --radius:16px;--shadow:0 2px 20px rgba(26,24,20,0.08);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:2rem 1rem 4rem;}
+  .site-header{width:100%;max-width:700px;display:flex;align-items:center;justify-content:space-between;margin-bottom:2.5rem;}
+  .logo{font-family:'DM Serif Display',serif;font-size:22px;color:var(--ink);}
+  .logo span{color:#52B788;}
+  .level-tag{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:5px 12px;border-radius:20px;background:var(--accent-light);color:var(--accent);}
+  .screen{width:100%;max-width:700px;display:none;animation:fadeUp .4s ease;}
+  .screen.active{display:block;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+  .welcome-hero{text-align:center;padding:3rem 2rem;background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--border);margin-bottom:1.5rem;}
+  .welcome-hero h1{font-family:'DM Serif Display',serif;font-size:clamp(32px,6vw,52px);line-height:1.1;margin-bottom:1rem;}
+  .welcome-hero h1 em{font-style:italic;color:#52B788;}
+  .welcome-hero p{font-size:16px;color:var(--ink2);max-width:400px;margin:0 auto 2rem;line-height:1.7;}
+  .info-chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:2rem;}
+  .chip{background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:6px 14px;font-size:13px;color:var(--ink2);}
+  .chip strong{color:var(--ink);}
+  .start-btn{background:var(--accent);color:#fff;border:none;border-radius:12px;padding:14px 36px;font-family:'DM Sans',sans-serif;font-size:16px;font-weight:500;cursor:pointer;transition:background .2s,transform .1s;}
+  .start-btn:hover{background:#1B4332;}
+  .start-btn:active{transform:scale(.98);}
+  .levels-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+  .level-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;box-shadow:var(--shadow);}
+  .level-card .lc-icon{font-size:24px;margin-bottom:8px;}
+  .level-card .lc-name{font-weight:600;font-size:14px;margin-bottom:4px;}
+  .level-card .lc-desc{font-size:12px;color:var(--ink3);line-height:1.4;}
+  .level-card.beginner .lc-name{color:#2D6A4F;}
+  .level-card.elementary .lc-name{color:#B5838D;}
+  .level-card.intermediate .lc-name{color:#6C63FF;}
+  .progress-wrap{margin-bottom:1.5rem;}
+  .progress-meta{display:flex;justify-content:space-between;font-size:13px;color:var(--ink2);margin-bottom:8px;}
+  .progress-track{height:6px;background:var(--border);border-radius:4px;overflow:hidden;}
+  .progress-fill{height:100%;background:linear-gradient(90deg,#52B788,#2D6A4F);border-radius:4px;transition:width .5s cubic-bezier(.4,0,.2,1);}
+  .q-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:2rem;box-shadow:var(--shadow);margin-bottom:1rem;}
+  .q-level-badge{display:inline-block;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:3px 10px;border-radius:20px;margin-bottom:1rem;}
+  .badge-beginner{background:var(--accent-light);color:var(--accent);}
+  .badge-elementary{background:#FCEEF0;color:#B5838D;}
+  .badge-intermediate{background:#EEF0FF;color:#6C63FF;}
+  .q-text{font-family:'DM Serif Display',serif;font-size:clamp(18px,3vw,24px);line-height:1.4;margin-bottom:1.75rem;}
+  .builder-area{min-height:52px;border:2px dashed var(--border);border-radius:10px;padding:10px 12px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:1rem;background:var(--bg);}
+  .builder-empty{color:var(--ink3);font-size:14px;font-style:italic;}
+  .word-bank{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:1.25rem;}
+  .wchip{background:var(--card);border:1.5px solid var(--border);border-radius:20px;padding:6px 16px;font-size:14px;cursor:pointer;color:var(--ink);transition:all .15s;user-select:none;}
+  .wchip:hover{border-color:#52B788;color:var(--accent);}
+  .wchip.in-builder{background:var(--accent);border-color:var(--accent);color:#fff;}
+  .wchip.in-builder:hover{background:var(--warn);border-color:var(--warn);}
+  .choices{display:flex;flex-direction:column;gap:10px;margin-bottom:1.25rem;}
+  .choice{border:1.5px solid var(--border);border-radius:12px;padding:12px 18px;font-size:15px;cursor:pointer;background:var(--card);color:var(--ink);text-align:left;transition:all .15s;display:flex;align-items:center;gap:12px;font-family:'DM Sans',sans-serif;}
+  .choice:hover{border-color:#52B788;background:var(--accent-light);}
+  .choice.selected{border-color:#52B788;background:var(--accent-light);color:var(--accent);}
+  .choice.correct{border-color:var(--accent);background:var(--accent-light);color:var(--accent);font-weight:500;}
+  .choice.wrong{border-color:var(--warn);background:var(--warn-light);color:var(--warn);}
+  .choice-letter{width:28px;height:28px;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0;border:1px solid var(--border);}
+  .feedback-bar{border-radius:10px;padding:10px 16px;font-size:14px;margin-bottom:1rem;display:none;font-weight:500;}
+  .feedback-bar.ok{background:var(--accent-light);color:var(--accent);}
+  .feedback-bar.err{background:var(--warn-light);color:var(--warn);}
+  .hint-btn{background:none;border:1px solid var(--border);border-radius:8px;padding:7px 14px;font-size:13px;color:var(--ink2);cursor:pointer;transition:all .15s;font-family:'DM Sans',sans-serif;}
+  .hint-btn:hover{border-color:#52B788;color:var(--accent);}
+  .hint-text{font-size:13px;color:var(--ink3);margin-top:6px;display:none;}
+  .check-btn{background:var(--accent);color:#fff;border:none;border-radius:10px;padding:11px 28px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:500;cursor:pointer;transition:all .15s;}
+  .check-btn:hover{background:#1B4332;}
+  .check-btn:active{transform:scale(.98);}
+  .next-btn{background:var(--ink);color:#fff;border:none;border-radius:10px;padding:11px 28px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:500;cursor:pointer;transition:all .15s;}
+  .next-btn:hover{background:#333;}
+  .q-footer{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;}
+  .result-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:2.5rem 2rem;box-shadow:var(--shadow);text-align:center;margin-bottom:1.5rem;}
+  .result-level-name{font-family:'DM Serif Display',serif;font-size:clamp(36px,7vw,60px);margin-bottom:.5rem;line-height:1;}
+  .result-score{font-size:14px;color:var(--ink2);margin-bottom:2rem;}
+  .result-desc{font-size:15px;color:var(--ink2);line-height:1.7;max-width:420px;margin:0 auto 2rem;}
+  .bar-chart{margin-bottom:2rem;text-align:left;}
+  .bar-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+  .bar-row-label{font-size:13px;width:100px;color:var(--ink2);flex-shrink:0;}
+  .bar-track{flex:1;height:10px;background:var(--border);border-radius:4px;overflow:hidden;}
+  .bar-fill{height:100%;border-radius:4px;transition:width .8s;}
+  .bar-pct{font-size:13px;font-weight:600;width:36px;text-align:right;}
+  .restart-btn{background:var(--accent);color:#fff;border:none;border-radius:10px;padding:13px 32px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:500;cursor:pointer;transition:all .15s;}
+  .restart-btn:hover{background:#1B4332;}
+  @media(max-width:480px){.levels-row{grid-template-columns:1fr;}.q-card{padding:1.25rem;}.welcome-hero{padding:2rem 1.25rem;}}
+</style>
+</head>
+<body>
+<header class="site-header">
+  <div class="logo">English<span>Level</span></div>
+  <div class="level-tag" id="current-level-tag">Free test</div>
+</header>
+
+<div class="screen active" id="screen-welcome">
+  <div class="welcome-hero">
+    <h1>Find your <em>English</em><br>level today</h1>
+    <p>15 questions. Three levels. Get an honest result and know exactly where to start learning.</p>
+    <div class="info-chips">
+      <div class="chip">⏱ <strong>5–7 minutes</strong></div>
+      <div class="chip">📊 <strong>15 questions</strong></div>
+      <div class="chip">🔀 <strong>New mix every time</strong></div>
+      <div class="chip">✅ <strong>Instant result</strong></div>
+    </div>
+    <button class="start-btn" onclick="startTest()">Start the test →</button>
+  </div>
+  <div class="levels-row">
+    <div class="level-card beginner"><div class="lc-icon">🌱</div><div class="lc-name">Beginner</div><div class="lc-desc">Basic words, simple sentences, present tense</div></div>
+    <div class="level-card elementary"><div class="lc-icon">📖</div><div class="lc-name">Elementary</div><div class="lc-desc">Past tense, questions, everyday topics</div></div>
+    <div class="level-card intermediate"><div class="lc-icon">🚀</div><div class="lc-name">Intermediate</div><div class="lc-desc">Complex grammar, conditionals, idioms</div></div>
+  </div>
+</div>
+
+<div class="screen" id="screen-quiz">
+  <div class="progress-wrap">
+    <div class="progress-meta"><span id="q-counter">Question 1 of 15</span><span id="q-level-label">Beginner</span></div>
+    <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+  </div>
+  <div class="q-card" id="q-card"></div>
+</div>
+
+<div class="screen" id="screen-results">
+  <div class="result-card" id="result-card"></div>
+</div>
+
+<script>
+const BANK={
+  beginner:[
+    {type:'choice',q:'I ___ a student.',opts:['am','is','are','be'],a:'am',hint:'Use "am" with I'},
+    {type:'choice',q:'She ___ coffee every morning.',opts:['drink','drinks','drinking','drank'],a:'drinks',hint:'She/He/It → add -s to verb'},
+    {type:'choice',q:'___ you speak English?',opts:['Do','Does','Are','Is'],a:'Do',hint:'Questions with I/You/We/They → Do'},
+    {type:'choice',q:'There ___ two books on the table.',opts:['is','am','are','be'],a:'are',hint:'Two books = plural → are'},
+    {type:'choice',q:'My name ___ Anna.',opts:['am','is','are','be'],a:'is',hint:'My name/He/She → is'},
+    {type:'choice',q:'We ___ friends.',opts:['am','is','are','be'],a:'are',hint:'We/You/They → are'},
+    {type:'choice',q:'___ is your name?',opts:['Who','What','Where','When'],a:'What',hint:'Asking for a name → What'},
+    {type:'choice',q:'I have ___ apple.',opts:['a','an','the','—'],a:'an',hint:'"apple" starts with a vowel → an'},
+    {type:'choice',q:'She ___ not like coffee.',opts:['do','does','is','are'],a:'does',hint:'She/He/It → does not'},
+    {type:'choice',q:'___ he at home?',opts:['Am','Is','Are','Do'],a:'Is',hint:'He/She/It → Is'},
+    {type:'choice',q:'I ___ hungry now.',opts:['am','is','are','be'],a:'am',hint:'I → am'},
+    {type:'choice',q:'They ___ students.',opts:['am','is','are','be'],a:'are',hint:'They → are'},
+    {type:'choice',q:'He ___ English every day.',opts:['study','studies','studying','studied'],a:'studies',hint:'He/She/It → add -ies for verbs ending in -y'},
+    {type:'choice',q:'___ are you from?',opts:['Who','What','Where','When'],a:'Where',hint:'Asking about a place → Where'},
+    {type:'choice',q:'I ___ a dog and two cats.',opts:['have','has','is','am'],a:'have',hint:'I/You/We/They → have'},
+    {type:'builder',q:'Put in order: She / every / coffee / drinks / morning',words:['She','every','coffee','drinks','morning'],a:['She','drinks','coffee','every','morning'],hint:'Subject → Verb → Object → Time'},
+    {type:'builder',q:'Put in order: My / Anna / name / is',words:['My','Anna','name','is'],a:['My','name','is','Anna'],hint:'My name is ...'},
+    {type:'builder',q:'Put in order: you / Do / speak / English?',words:['you','Do','speak','English?'],a:['Do','you','speak','English?'],hint:'Questions: Do + subject + verb'},
+    {type:'builder',q:'Put in order: a / I / teacher / am',words:['a','I','teacher','am'],a:['I','am','a','teacher'],hint:'I am a ...'},
+    {type:'builder',q:'Put in order: live / in / I / London',words:['live','in','I','London'],a:['I','live','in','London'],hint:'I live in ...'},
+  ],
+  elementary:[
+    {type:'choice',q:'I ___ to the cinema yesterday.',opts:['go','went','goes','going'],a:'went',hint:'"Yesterday" = past tense. go → went'},
+    {type:'choice',q:'She ___ a book when I called.',opts:['reads','read','was reading','is reading'],a:'was reading',hint:'Action in progress in the past → was/were + -ing'},
+    {type:'choice',q:'Have you ever ___ to Italy?',opts:['go','went','been','gone'],a:'been',hint:'Have you ever → past participle: go → been'},
+    {type:'choice',q:'He ___ to the gym three times a week.',opts:['go','goes','went','is go'],a:'goes',hint:'He/She/It → goes (habit)'},
+    {type:'choice',q:"I ___ my keys! I can't find them.",opts:['lose','lost','have lost','am losing'],a:'have lost',hint:'Result in the present → present perfect'},
+    {type:'choice',q:'___ she finish her homework yesterday?',opts:['Do','Does','Did','Was'],a:'Did',hint:'Past tense question → Did'},
+    {type:'choice',q:'We ___ pizza for dinner last night.',opts:['eat','eats','are eating','ate'],a:'ate',hint:'"Last night" = past simple. eat → ate'},
+    {type:'choice',q:'They ___ in this city for five years.',opts:['live','lives','have lived','lived'],a:'have lived',hint:'Period up to now → present perfect: have + lived'},
+    {type:'choice',q:'He is ___ than his brother.',opts:['tall','taller','tallest','more tall'],a:'taller',hint:'Comparing two people → -er (comparative)'},
+    {type:'choice',q:'This is ___ book I have ever read.',opts:['good','better','the best','best'],a:'the best',hint:'Superlative = the + -est'},
+    {type:'choice',q:'She ___ English for two years when she moved abroad.',opts:['studies','studied','had studied','has studied'],a:'had studied',hint:'Before another past event → past perfect (had + verb)'},
+    {type:'choice',q:'I usually ___ up at 7 am.',opts:['wake','wakes','woke','am waking'],a:'wake',hint:'I/You/We/They → base form for habits'},
+    {type:'choice',q:'___ your brother like football?',opts:['Do','Does','Did','Is'],a:'Does',hint:'He/She/It → Does for present questions'},
+    {type:'choice',q:'We ___ dinner when he arrived.',opts:['had','have','were having','are having'],a:'were having',hint:'Interrupted action in past → was/were + -ing'},
+    {type:'choice',q:'She is ___ intelligent ___ her sister.',opts:['as ... as','more ... than','the most','so ... that'],a:'as ... as',hint:'Equal comparison → as ... as'},
+    {type:'builder',q:'Put in order: to / went / I / yesterday / cinema / the',words:['to','went','I','yesterday','cinema','the'],a:['I','went','to','the','cinema','yesterday'],hint:'I went to the cinema yesterday'},
+    {type:'builder',q:'Put in order: ever / you / Italy / Have / been / to?',words:['ever','you','Italy','Have','been','to?'],a:['Have','you','ever','been','to','Italy?'],hint:'Have + you + ever + been to ...?'},
+    {type:'builder',q:'Put in order: is / He / taller / his / than / brother',words:['is','He','taller','his','than','brother'],a:['He','is','taller','than','his','brother'],hint:'He is taller than ...'},
+    {type:'builder',q:'Put in order: lived / They / years / five / for / here / have',words:['lived','They','years','five','for','here','have'],a:['They','have','lived','here','for','five','years'],hint:'They have lived here for ...'},
+    {type:'builder',q:'Put in order: reading / was / arrived / when / she / I',words:['reading','was','arrived','when','she','I'],a:['She','was','reading','when','I','arrived'],hint:'She was reading when I arrived'},
+  ],
+  intermediate:[
+    {type:'choice',q:'If I ___ you, I would apologise.',opts:['am','was','were','had been'],a:'were',hint:'Second conditional: If I were ... (hypothetical)'},
+    {type:'choice',q:'She ___ the report by the time the boss arrives.',opts:['will finish','finishes','will have finished','is finishing'],a:'will have finished',hint:'Completed before a future point → future perfect'},
+    {type:'choice',q:'I wish I ___ more time to travel.',opts:['have','had','would have','will have'],a:'had',hint:'"I wish" + past tense for present wishes'},
+    {type:'choice',q:'The meeting has been ___ until next week.',opts:['put off','put up','put in','put on'],a:'put off',hint:'"put off" = postpone'},
+    {type:'choice',q:'He denied ___ the money.',opts:['to take','taking','take','taken'],a:'taking',hint:'deny + -ing (gerund)'},
+    {type:'choice',q:'By 2030, scientists ___ a cure.',opts:['find','will find','will have found','had found'],a:'will have found',hint:'Completed before a future time → future perfect'},
+    {type:'choice',q:'She is used to ___ early.',opts:['wake','waking','woke','be waking'],a:'waking',hint:'"be used to" + -ing (gerund)'},
+    {type:'choice',q:'The criminal was ___ to ten years in prison.',opts:['sentenced','sentence','sentencing','be sentenced'],a:'sentenced',hint:'Passive voice: was + past participle'},
+    {type:'choice',q:'I would have called you if I ___ your number.',opts:['know','knew','had known','would know'],a:'had known',hint:'Third conditional: if + past perfect'},
+    {type:'choice',q:'She suggested ___ a new approach.',opts:['to try','trying','try','tried'],a:'trying',hint:'"suggest" + -ing (gerund)'},
+    {type:'choice',q:'___ the traffic, we arrived on time.',opts:['Despite','Although','However','Even though'],a:'Despite',hint:'"Despite" + noun phrase (no verb)'},
+    {type:'choice',q:'The report ___ by the committee before the deadline.',opts:['was submitted','submitted','has submitted','submits'],a:'was submitted',hint:'Passive: was + past participle'},
+    {type:'choice',q:'He ___ working here since 2019.',opts:['is','was','has been','had been'],a:'has been',hint:'Ongoing from past to now → present perfect continuous'},
+    {type:'choice',q:'No sooner ___ than it started raining.',opts:['we left','had we left','we had left','did we leave'],a:'had we left',hint:'Inversion after "No sooner" → had + subject'},
+    {type:'choice',q:'___ it rain tomorrow, we will cancel the trip.',opts:['Should','Would','Will','Did'],a:'Should',hint:'Formal conditional = Should + subject + verb'},
+    {type:'builder',q:'Put in order: I / were / would / you / if / apologise / I',words:['I','were','would','you','if','apologise','I'],a:['If','I','were','you','I','would','apologise'],hint:'If I were you, I would ...'},
+    {type:'builder',q:'Put in order: to / used / is / waking / She / up / early',words:['to','used','is','waking','She','up','early'],a:['She','is','used','to','waking','up','early'],hint:'She is used to waking up early'},
+    {type:'builder',q:'Put in order: submitted / report / The / was / committee / by / the',words:['submitted','report','The','was','committee','by','the'],a:['The','report','was','submitted','by','the','committee'],hint:'Passive: The report was submitted by ...'},
+    {type:'builder',q:'Put in order: been / since / He / has / here / 2019 / working',words:['been','since','He','has','here','2019','working'],a:['He','has','been','working','here','since','2019'],hint:'He has been working here since ...'},
+    {type:'builder',q:'Put in order: will / report / finished / She / the / have / arrives / boss / the / before',words:['will','report','finished','She','the','have','arrives','boss','the','before'],a:['She','will','have','finished','the','report','before','the','boss','arrives'],hint:'She will have finished ... before the boss arrives'},
+  ]
+};
+
+let questions=[],current=0,scores={beginner:[],elementary:[],intermediate:[]};
+let answered=false,builtWords=[],remainingWords=[],selectedChoice=null;
+
+function shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+function startTest(){
+  scores={beginner:[],elementary:[],intermediate:[]};
+  questions=[...shuffle(BANK.beginner).slice(0,5),...shuffle(BANK.elementary).slice(0,5),...shuffle(BANK.intermediate).slice(0,5)];
+  current=0;
+  show('screen-quiz');
+  renderQuestion();
+}
+
+function getLevel(idx){return idx<5?'beginner':idx<10?'elementary':'intermediate';}
+function getLevelLabel(l){return{beginner:'Beginner',elementary:'Elementary',intermediate:'Intermediate'}[l];}
+function getBadge(l){return{beginner:'badge-beginner',elementary:'badge-elementary',intermediate:'badge-intermediate'}[l];}
+
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
+
+function renderQuestion(){
+  const q=questions[current];const level=getLevel(current);
+  answered=false;builtWords=[];selectedChoice=null;
+  remainingWords=q.type==='builder'?shuffle([...q.words]):[];
+  document.getElementById('q-counter').textContent=`Question ${current+1} of ${questions.length}`;
+  document.getElementById('q-level-label').textContent=getLevelLabel(level);
+  document.getElementById('progress-fill').style.width=`${(current/questions.length)*100}%`;
+  document.getElementById('current-level-tag').textContent=getLevelLabel(level);
+  const card=document.getElementById('q-card');
+  const letters=['A','B','C','D'];
+  card.innerHTML=`
+    <div class="q-level-badge ${getBadge(level)}">${getLevelLabel(level)}</div>
+    <div class="q-text">${q.q}</div>
+    ${q.type==='choice'
+      ?`<div class="choices" id="choices">${q.opts.map((o,i)=>`<button class="choice" onclick="selectChoice(this,${JSON.stringify(o)})"><span class="choice-letter">${letters[i]}</span>${o}</button>`).join('')}</div>`
+      :`<div class="builder-area" id="builder-area"><span class="builder-empty">Tap words below to build the sentence ↓</span></div><div class="word-bank" id="word-bank"></div>`}
+    <div class="feedback-bar" id="feedback"></div>
+    <div class="q-footer">
+      <div>
+        <button class="hint-btn" onclick="toggleHint()">💡 Hint</button>
+        <div class="hint-text" id="hint-text">${q.hint}</div>
+      </div>
+      <button class="check-btn" id="action-btn" onclick="checkAnswer()">Check →</button>
+    </div>`;
+  if(q.type==='builder')updateBuilderUI();
+}
+
+function updateBuilderUI(){
+  const area=document.getElementById('builder-area');
+  const bank=document.getElementById('word-bank');
+  if(!area||!bank)return;
+  area.innerHTML=builtWords.length?builtWords.map((w,i)=>`<span class="wchip in-builder" onclick="removeFromBuilder(${i})">${w}</span>`).join(''):`<span class="builder-empty">Tap words below to build the sentence ↓</span>`;
+  bank.innerHTML=remainingWords.map((w,i)=>`<span class="wchip" onclick="addToBuilder(${i})">${w}</span>`).join('');
+}
+
+function addToBuilder(i){if(answered)return;builtWords.push(remainingWords[i]);remainingWords.splice(i,1);updateBuilderUI();}
+function removeFromBuilder(i){if(answered)return;remainingWords.push(builtWords[i]);builtWords.splice(i,1);updateBuilderUI();}
+function selectChoice(el,val){if(answered)return;selectedChoice=val;document.querySelectorAll('.choice').forEach(c=>c.classList.remove('selected'));el.classList.add('selected');}
+function toggleHint(){const h=document.getElementById('hint-text');h.style.display=h.style.display==='block'?'none':'block';}
+
+function checkAnswer(){
+  if(answered){nextQuestion();return;}
+  const q=questions[current];const level=getLevel(current);let correct=false;
+  if(q.type==='choice'){
+    if(!selectedChoice)return;
+    correct=selectedChoice===q.a;
+    document.querySelectorAll('.choice').forEach(c=>{
+      const txt=c.textContent.trim().replace(/^[ABCD]/,'').trim();
+      if(txt===q.a)c.classList.add('correct');
+      else if(txt===selectedChoice&&!correct)c.classList.add('wrong');
+      c.onclick=null;
+    });
+  } else {
+    if(!builtWords.length)return;
+    correct=builtWords.join(' ')===q.a.join(' ');
+  }
+  scores[level].push(correct?1:0);answered=true;
+  const fb=document.getElementById('feedback');
+  fb.style.display='block';fb.className='feedback-bar '+(correct?'ok':'err');
+  fb.textContent=correct?'✓ Correct! Well done.':'✗ Not quite. Correct: '+(q.type==='choice'?q.a:q.a.join(' '));
+  const btn=document.getElementById('action-btn');
+  btn.textContent=current<questions.length-1?'Next →':'See results →';
+  btn.className='next-btn';
+}
+
+function nextQuestion(){current++;if(current>=questions.length){showResults();return;}renderQuestion();}
+
+function showResults(){
+  const bS=scores.beginner.reduce((a,b)=>a+b,0);
+  const eS=scores.elementary.reduce((a,b)=>a+b,0);
+  const iS=scores.intermediate.reduce((a,b)=>a+b,0);
+  const total=bS+eS+iS;const pct=Math.round((total/questions.length)*100);
+  let lvl,desc,color;
+  if(pct>=80){lvl='Intermediate';color='#6C63FF';desc='Great work! You handle complex grammar, tenses, and structures confidently. You are ready for upper-intermediate study and real conversations.';}
+  else if(pct>=50){lvl='Elementary';color='#B5838D';desc='You know the basics and can handle everyday English. Focus on past tenses, questions, and expanding your vocabulary to reach the next level.';}
+  else{lvl='Beginner';color='#2D6A4F';desc='You are at the start of your journey — and that is perfectly fine! Focus on core vocabulary, present tense, and simple sentences first.';}
+  show('screen-results');
+  document.getElementById('current-level-tag').textContent=lvl;
+  document.getElementById('progress-fill').style.width='100%';
+  const bP=Math.round((bS/5)*100),eP=Math.round((eS/5)*100),iP=Math.round((iS/5)*100);
+  document.getElementById('result-card').innerHTML=`
+    <div style="font-size:13px;color:var(--ink3);letter-spacing:.07em;text-transform:uppercase;margin-bottom:.5rem">Your level</div>
+    <div class="result-level-name" style="color:${color}">${lvl}</div>
+    <div class="result-score">${total} correct out of ${questions.length} · ${pct}%</div>
+    <div class="bar-chart">
+      <div class="bar-row"><div class="bar-row-label">🌱 Beginner</div><div class="bar-track"><div class="bar-fill" style="width:${bP}%;background:#52B788"></div></div><div class="bar-pct" style="color:#2D6A4F">${bP}%</div></div>
+      <div class="bar-row"><div class="bar-row-label">📖 Elementary</div><div class="bar-track"><div class="bar-fill" style="width:${eP}%;background:#B5838D"></div></div><div class="bar-pct" style="color:#B5838D">${eP}%</div></div>
+      <div class="bar-row"><div class="bar-row-label">🚀 Intermediate</div><div class="bar-track"><div class="bar-fill" style="width:${iP}%;background:#6C63FF"></div></div><div class="bar-pct" style="color:#6C63FF">${iP}%</div></div>
+    </div>
+    <div class="result-desc">${desc}</div>
+    <button class="restart-btn" onclick="startTest()">Try again with new questions ↺</button>`;
+}
+</script>
+</body>
+</html>
