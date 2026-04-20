@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>English Level Test - Find Your Level</title>
+<style>
+:root{
+  --bg:#F5F2EB;--card:#FFF;--ink:#1A1814;--ink2:#6B6560;--ink3:#A8A39E;
+  --accent:#2D6A4F;--accent2:#52B788;--accent-light:#D8F3DC;
+  --warn:#C9184A;--warn-light:#FFE5EC;--border:#E8E4DC;
+  --radius:16px;--shadow:0 2px 20px rgba(26,24,20,0.08);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen,Ubuntu,Cantarell,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:1.5rem 1rem 4rem;line-height:1.6;}
+.site-header{width:100%;max-width:720px;display:flex;align-items:center;justify-content:space-between;margin-bottom:2.5rem;}
+.logo{font-size:24px;font-weight:700;color:var(--ink);letter-spacing:-0.5px;}
+.logo span{color:#52B788;}
+.level-tag{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:6px 14px;border-radius:20px;background:var(--accent-light);color:var(--accent);}
+.screen{width:100%;max-width:720px;display:none;animation:fadeUp .5s ease;}
+.screen.active{display:block;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.welcome-hero{text-align:center;padding:3.5rem 2rem;background:var(--card);border-radius:20px;box-shadow:var(--shadow);border:1px solid var(--border);margin-bottom:2rem;}
+.welcome-hero h1{font-size:clamp(36px,7vw,64px);line-height:1.1;margin-bottom:1.25rem;font-weight:800;letter-spacing:-1px;}
+.welcome-hero h1 em{font-style:normal;color:#52B788;}
+.welcome-hero p{font-size:17px;color:var(--ink2);max-width:460px;margin:0 auto 2.5rem;line-height:1.7;}
+.info-chips{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:2.5rem;}
+.chip{background:var(--bg);border:1px solid var(--border);border-radius:24px;padding:8px 16px;font-size:14px;color:var(--ink2);font-weight:500;}
+.chip strong{color:var(--ink);font-weight:600;}
+.start-btn{background:var(--accent);color:#fff;border:none;border-radius:14px;padding:16px 42px;font-size:17px;font-weight:600;cursor:pointer;transition:all .2s;box-shadow:0 4px 12px rgba(45,106,79,0.2);}
+.start-btn:hover{background:#1B4332;transform:translateY(-2px);box-shadow:0 6px 16px rgba(45,106,79,0.3);}
+.start-btn:active{transform:translateY(0);}
+.levels-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+.level-card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:1.5rem;box-shadow:var(--shadow);transition:transform .2s;}
+.level-card:hover{transform:translateY(-4px);}
+.level-card .lc-icon{font-size:32px;margin-bottom:10px;}
+.level-card .lc-name{font-weight:700;font-size:15px;margin-bottom:6px;}
+.level-card .lc-desc{font-size:13px;color:var(--ink3);line-height:1.5;}
+.level-card.beginner .lc-name{color:#2D6A4F;}
+.level-card.elementary .lc-name{color:#B5838D;}
+.level-card.intermediate .lc-name{color:#6C63FF;}
+.progress-wrap{margin-bottom:2rem;}
+.progress-meta{display:flex;justify-content:space-between;font-size:14px;color:var(--ink2);margin-bottom:10px;font-weight:500;}
+.progress-track{height:8px;background:var(--border);border-radius:10px;overflow:hidden;}
+.progress-fill{height:100%;background:linear-gradient(90deg,#52B788,#2D6A4F);border-radius:10px;transition:width .6s cubic-bezier(.4,0,.2,1);}
+.q-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:2.5rem;box-shadow:var(--shadow);margin-bottom:1.5rem;animation:slideIn .3s ease;}
+@keyframes slideIn{from{opacity:0;transform:scale(.98)}to{opacity:1;transform:scale(1)}}
+.q-level-badge{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:4px 12px;border-radius:20px;margin-bottom:1.25rem;}
+.badge-beginner{background:var(--accent-light);color:var(--accent);}
+.badge-elementary{background:#FCEEF0;color:#B5838D;}
+.badge-intermediate{background:#EEF0FF;color:#6C63FF;}
+.q-text{font-size:clamp(20px,4vw,28px);line-height:1.45;margin-bottom:2rem;font-weight:600;letter-spacing:-0.3px;}
+.builder-area{min-height:60px;border:2px dashed var(--border);border-radius:12px;padding:12px 14px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:1.25rem;background:var(--bg);transition:border-color .2s;}
+.builder-area:hover{border-color:var(--accent2);}
+.builder-empty{color:var(--ink3);font-size:15px;font-style:italic;}
+.word-bank{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:1.5rem;}
+.wchip{background:var(--card);border:2px solid var(--border);border-radius:24px;padding:8px 18px;font-size:15px;cursor:pointer;color:var(--ink);transition:all .2s;user-select:none;font-weight:500;}
+.wchip:hover{border-color:#52B788;color:var(--accent);transform:translateY(-2px);}
+.wchip.in-builder{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 2px 8px rgba(45,106,79,0.3);}
+.wchip.in-builder:hover{background:var(--warn);border-color:var(--warn);}
+.choices{display:flex;flex-direction:column;gap:12px;margin-bottom:1.5rem;}
+.choice{border:2px solid var(--border);border-radius:14px;padding:14px 20px;font-size:16px;cursor:pointer;background:var(--card);color:var(--ink);text-align:left;transition:all .2s;display:flex;align-items:center;gap:14px;font-weight:500;}
+.choice:hover{border-color:#52B788;background:var(--accent-light);transform:translateX(4px);}
+.choice.selected{border-color:#52B788;background:var(--accent-light);color:var(--accent);box-shadow:0 0 0 3px rgba(82,183,136,0.1);}
+.choice.correct{border-color:var(--accent);background:var(--accent-light);color:var(--accent);font-weight:600;}
+.choice.wrong{border-color:var(--warn);background:var(--warn-light);color:var(--warn);}
+.choice-letter{width:32px;height:32px;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;border:1px solid var(--border);}
+.feedback-bar{border-radius:12px;padding:12px 18px;font-size:15px;margin-bottom:1.25rem;display:none;font-weight:600;}
+.feedback-bar.ok{background:var(--accent-light);color:var(--accent);}
+.feedback-bar.err{background:var(--warn-light);color:var(--warn);}
+.hint-btn{background:none;border:2px solid var(--border);border-radius:10px;padding:9px 16px;font-size:14px;color:var(--ink2);cursor:pointer;transition:all .2s;font-weight:600;}
+.hint-btn:hover{border-color:#52B788;color:var(--accent);background:var(--accent-light);}
+.hint-text{font-size:14px;color:var(--ink3);margin-top:8px;display:none;background:var(--bg);padding:10px 14px;border-radius:8px;border-left:3px solid var(--accent2);}
+.check-btn{background:var(--accent);color:#fff;border:none;border-radius:12px;padding:13px 32px;font-size:16px;font-weight:700;cursor:pointer;transition:all .2s;box-shadow:0 4px 12px rgba(45,106,79,0.2);}
+.check-btn:hover{background:#1B4332;transform:translateY(-2px);}
+.check-btn:active{transform:translateY(0);}
+.next-btn{background:var(--ink);color:#fff;border:none;border-radius:12px;padding:13px 32px;font-size:16px;font-weight:700;cursor:pointer;transition:all .2s;box-shadow:0 4px 12px rgba(26,24,20,0.2);}
+.next-btn:hover{background:#333;transform:translateY(-2px);}
+.q-footer{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;}
+.result-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:3rem 2.5rem;box-shadow:var(--shadow);text-align:center;margin-bottom:2rem;}
+.result-level-name{font-size:clamp(42px,8vw,72px);margin-bottom:.75rem;line-height:1;font-weight:800;letter-spacing:-1px;}
+.result-score{font-size:15px;color:var(--ink2);margin-bottom:2.5rem;font-weight:500;}
+.result-desc{font-size:16px;color:var(--ink2);line-height:1.8;max-width:480px;margin:0 auto 2.5rem;}
+.bar-chart{margin-bottom:2.5rem;text-align:left;}
+.bar-row{display:flex;align-items:center;gap:12px;margin-bottom:12px;}
+.bar-row-label{font-size:14px;width:110px;color:var(--ink2);flex-shrink:0;font-weight:600;}
+.bar-track{flex:1;height:12px;background:var(--border);border-radius:10px;overflow:hidden;}
+.bar-fill{height:100%;border-radius:10px;transition:width 1s cubic-bezier(.4,0,.2,1);}
+.bar-pct{font-size:14px;font-weight:700;width:40px;text-align:right;}
+.restart-btn{background:var(--accent);color:#fff;border:none;border-radius:12px;padding:15px 36px;font-size:16px;font-weight:700;cursor:pointer;transition:all .2s;box-shadow:0 4px 12px rgba(45,106,79,0.2);}
+.restart-btn:hover{background:#1B4332;transform:translateY(-2px);}
+@media(max-width:560px){.levels-row{grid-template-columns:1fr;}.q-card{padding:1.75rem;}.welcome-hero{padding:2.5rem 1.5rem;}}
+</style>
+</head>
+<body>
+<header class="site-header">
+  <div class="logo">English<span>Level</span></div>
+  <div class="level-tag" id="current-level-tag">Free test</div>
+</header>
+
+<div class="screen active" id="screen-welcome">
+  <div class="welcome-hero">
+    <h1>Find your <em>English</em> level</h1>
+    <p>Take 15 questions across three levels. Get instant results and know exactly where you stand.</p>
+    <div class="info-chips">
+      <div class="chip">⏱ <strong>5 minutes</strong></div>
+      <div class="chip">📊 <strong>15 questions</strong></div>
+      <div class="chip">🔀 <strong>Random selection</strong></div>
+      <div class="chip">✅ <strong>Instant feedback</strong></div>
+    </div>
+    <button class="start-btn" onclick="startTest()">Start the test →</button>
+  </div>
+  <div class="levels-row">
+    <div class="level-card beginner"><div class="lc-icon">🌱</div><div class="lc-name">Beginner</div><div class="lc-desc">Basic words, present tense, simple sentences</div></div>
+    <div class="level-card elementary"><div class="lc-icon">📖</div><div class="lc-name">Elementary</div><div class="lc-desc">Past tense, questions, comparisons</div></div>
+    <div class="level-card intermediate"><div class="lc-icon">🚀</div><div class="lc-name">Intermediate</div><div class="lc-desc">Complex grammar, conditionals, phrasal verbs</div></div>
+  </div>
+</div>
+
+<div class="screen" id="screen-quiz">
+  <div class="progress-wrap">
+    <div class="progress-meta"><span id="q-counter">Question 1 of 15</span><span id="q-level-label">Beginner</span></div>
+    <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+  </div>
+  <div class="q-card" id="q-card"></div>
+</div>
+
+<div class="screen" id="screen-results">
+  <div class="result-card" id="result-card"></div>
+</div>
+
+<script>
+const BANK={
+  beginner:[
+    {t:'choice',q:'I ___ a student.',o:['am','is','are','be'],a:'am',h:'Use "am" with I'},
+    {t:'choice',q:'She ___ coffee every morning.',o:['drink','drinks','drinking','drank'],a:'drinks',h:'She/He/It → verb + s'},
+    {t:'choice',q:'___ you speak English?',o:['Do','Does','Are','Is'],a:'Do',h:'Questions: Do + I/you/we/they'},
+    {t:'choice',q:'There ___ two books on the table.',o:['is','am','are','be'],a:'are',h:'Plural → are'},
+    {t:'choice',q:'My name ___ Anna.',o:['am','is','are','be'],a:'is',h:'He/She/It/name → is'},
+    {t:'choice',q:'We ___ friends.',o:['am','is','are','be'],a:'are',h:'We/you/they → are'},
+    {t:'choice',q:'___ is your name?',o:['Who','What','Where','When'],a:'What',h:'Name → What'},
+    {t:'choice',q:'I have ___ apple.',o:['a','an','the','—'],a:'an',h:'Vowel sound → an'},
+    {t:'choice',q:'She ___ not like coffee.',o:['do','does','is','are'],a:'does',h:'She/He/It → does not'},
+    {t:'choice',q:'___ he at home?',o:['Am','Is','Are','Do'],a:'Is',h:'He/She/It → Is'},
+    {t:'choice',q:'I ___ hungry now.',o:['am','is','are','be'],a:'am',h:'I → am'},
+    {t:'choice',q:'They ___ students.',o:['am','is','are','be'],a:'are',h:'They → are'},
+    {t:'choice',q:'He ___ English every day.',o:['study','studies','studying','studied'],a:'studies',h:'He/She/It → -ies'},
+    {t:'choice',q:'___ are you from?',o:['Who','What','Where','When'],a:'Where',h:'Place → Where'},
+    {t:'choice',q:'I ___ a dog.',o:['have','has','is','am'],a:'have',h:'I/you/we/they → have'},
+    {t:'choice',q:'This ___ my book.',o:['am','is','are','be'],a:'is',h:'This → is'},
+    {t:'choice',q:'___ they live in London?',o:['Do','Does','Are','Is'],a:'Do',h:'They → Do'},
+    {t:'choice',q:'She ___ a teacher.',o:['am','is','are','be'],a:'is',h:'She → is'},
+    {t:'choice',q:'We ___ not tired.',o:['am','is','are','be'],a:'are',h:'We → are not'},
+    {t:'choice',q:'___ you like pizza?',o:['Do','Does','Are','Is'],a:'Do',h:'You → Do'},
+    {t:'choice',q:'He ___ very tall.',o:['am','is','are','be'],a:'is',h:'He → is'},
+    {t:'choice',q:'I ___ 25 years old.',o:['am','is','are','have'],a:'am',h:'I → am'},
+    {t:'choice',q:'They ___ from Russia.',o:['am','is','are','be'],a:'are',h:'They → are'},
+    {t:'choice',q:'___ is this?',o:['Who','What','Where','When'],a:'What',h:'Thing → What'},
+    {t:'choice',q:'She ___ in Moscow.',o:['live','lives','living','lived'],a:'lives',h:'She → lives'},
+    {t:'choice',q:'We ___ English.',o:['speak','speaks','speaking','spoke'],a:'speak',h:'We → speak'},
+    {t:'choice',q:'___ he a doctor?',o:['Am','Is','Are','Do'],a:'Is',h:'He → Is'},
+    {t:'choice',q:'I ___ work on Sundays.',o:["don't","doesn't","am not","isn't"],a:"don't",h:'I → don\'t'},
+    {t:'choice',q:'She ___ happy today.',o:['am','is','are','be'],a:'is',h:'She → is'},
+    {t:'choice',q:'___ old are you?',o:['How','What','Where','Who'],a:'How',h:'Age → How'},
+    {t:'choice',q:'They ___ nice people.',o:['am','is','are','be'],a:'are',h:'They → are'},
+    {t:'choice',q:'This ___ very interesting.',o:['am','is','are','be'],a:'is',h:'This → is'},
+    {t:'choice',q:'I ___ like tea.',o:["don't","doesn't","am not","isn't"],a:"don't",h:'I → don\'t'},
+    {t:'choice',q:'___ she work here?',o:['Do','Does','Is','Are'],a:'Does',h:'She → Does'},
+    {t:'choice',q:'We ___ at school.',o:['am','is','are','be'],a:'are',h:'We → are'},
+    {t:'builder',q:'Put in order: She / every / coffee / drinks / morning',w:['She','every','coffee','drinks','morning'],a:['She','drinks','coffee','every','morning'],h:'Subject → Verb → Object → Time'},
+    {t:'builder',q:'Put in order: My / Anna / name / is',w:['My','Anna','name','is'],a:['My','name','is','Anna'],h:'My name is ...'},
+    {t:'builder',q:'Put in order: you / Do / speak / English?',w:['you','Do','speak','English?'],a:['Do','you','speak','English?'],h:'Do + you + verb'},
+    {t:'builder',q:'Put in order: a / I / teacher / am',w:['a','I','teacher','am'],a:['I','am','a','teacher'],h:'I am a ...'},
+    {t:'builder',q:'Put in order: live / in / I / London',w:['live','in','I','London'],a:['I','live','in','London'],h:'I live in ...'},
+    {t:'builder',q:'Put in order: old / are / you / How?',w:['old','are','you','How?'],a:['How','old','are','you?'],h:'How old are you?'},
+    {t:'builder',q:'Put in order: is / This / book / my',w:['is','This','book','my'],a:['This','is','my','book'],h:'This is my ...'},
+    {t:'builder',q:'Put in order: they / Are / students?',w:['they','Are','students?'],a:['Are','they','students?'],h:'Are they ...?'},
+    {t:'builder',q:'Put in order: not / We / tired / are',w:['not','We','tired','are'],a:['We','are','not','tired'],h:'We are not ...'},
+    {t:'builder',q:'Put in order: does / live / Where / he?',w:['does','live','Where','he?'],a:['Where','does','he','live?'],h:'Where does he ...?'},
+    {t:'choice',q:'It ___ cold today.',o:['am','is','are','be'],a:'is',h:'It → is'},
+    {t:'choice',q:'___ you hungry?',o:['Am','Is','Are','Do'],a:'Are',h:'You → Are'},
+    {t:'choice',q:'He ___ like milk.',o:["don't","doesn't","isn't","aren't"],a:"doesn't",h:'He → doesn\'t'},
+    {t:'choice',q:'___ is your friend?',o:['What','Who','Where','When'],a:'Who',h:'Person → Who'},
+    {t:'choice',q:'I ___ from Uzbekistan.',o:['am','is','are','be'],a:'am',h:'I → am'},
+    {t:'choice',q:'She ___ two brothers.',o:['have','has','is','are'],a:'has',h:'She → has'},
+    {t:'choice',q:'___ they students?',o:['Am','Is','Are','Do'],a:'Are',h:'They → Are'},
+    {t:'choice',q:'We ___ watch TV in the evening.',o:["don't","doesn't","isn't","aren't"],a:"don't",h:'We → don\'t'},
+    {t:'choice',q:'___ time is it?',o:['Who','What','Where','When'],a:'What',h:'Time → What'},
+    {t:'choice',q:'He ___ at work.',o:['am','is','are','be'],a:'is',h:'He → is'},
+    {t:'choice',q:'I ___ three sisters.',o:['have','has','am','is'],a:'have',h:'I → have'},
+    {t:'choice',q:'They ___ play football.',o:["don't","doesn't","isn't","aren't"],a:"don't",h:'They → don\'t'},
+    {t:'choice',q:'___ do you live?',o:['Who','What','Where','When'],a:'Where',h:'Place → Where'},
+    {t:'choice',q:'She ___ beautiful.',o:['am','is','are','be'],a:'is',h:'She → is'},
+    {t:'choice',q:'We ___ happy.',o:['am','is','are','be'],a:'are',h:'We → are'},
+    {t:'choice',q:'___ he speak Russian?',o:['Do','Does','Is','Are'],a:'Does',h:'He → Does'},
+    {t:'choice',q:'I ___ busy now.',o:['am','is','are','be'],a:'am',h:'I → am'},
+    {t:'choice',q:'It ___ expensive.',o:['am','is','are','be'],a:'is',h:'It → is'},
+    {t:'choice',q:'___ you work here?',o:['Do','Does','Are','Is'],a:'Do',h:'You → Do'},
+    {t:'choice',q:'They ___ very nice.',o:['am','is','are','be'],a:'are',h:'They → are'},
+    {t:'choice',q:'She ___ live here.',o:["don't","doesn't","isn't","aren't"],a:"doesn't",h:'She → doesn\'t'},
+    {t:'choice',q:'___ is your job?',o:['Who','What','Where','When'],a:'What',h:'Job → What'},
+    {t:'choice',q:'He ___ a car.',o:['have','has','is','are'],a:'has',h:'He → has'},
+    {t:'choice',q:'I ___ understand.',o:["don't","doesn't","am not","isn't"],a:"don't",h:'I → don\'t'},
+    {t:'choice',q:'___ she like music?',o:['Do','Does','Is','Are'],a:'Does',h:'She → Does'},
+  ],
+  elementary:[
+    {t:'choice',q:'I ___ to the cinema yesterday.',o:['go','went','goes','going'],a:'went',h:'Yesterday → past: went'},
+    {t:'choice',q:'She ___ a book when I called.',o:['reads','read','was reading','is reading'],a:'was reading',h:'Past continuous: was -ing'},
+    {t:'choice',q:'Have you ever ___ to Italy?',o:['go','went','been','gone'],a:'been',h:'Ever → been (present perfect)'},
+    {t:'choice',q:'He ___ to the gym three times a week.',o:['go','goes','went','going'],a:'goes',h:'Habit → present simple: goes'},
+    {t:'choice',q:"I ___ my keys! I can't find them.",o:['lose','lost','have lost','am losing'],a:'have lost',h:'Result now → present perfect'},
+    {t:'choice',q:'___ she finish her homework yesterday?',o:['Do','Does','Did','Was'],a:'Did',h:'Past question → Did'},
+    {t:'choice',q:'We ___ pizza last night.',o:['eat','eats','are eating','ate'],a:'ate',h:'Last night → past: ate'},
+    {t:'choice',q:'They ___ in this city for five years.',o:['live','lives','have lived','lived'],a:'have lived',h:'For + period → present perfect'},
+    {t:'choice',q:'He is ___ than his brother.',o:['tall','taller','tallest','more tall'],a:'taller',h:'Comparative → -er'},
+    {t:'choice',q:'This is ___ book I have ever read.',o:['good','better','the best','best'],a:'the best',h:'Superlative → the + -est'},
+    {t:'choice',q:'She ___ English for two years before moving.',o:['studies','studied','had studied','has studied'],a:'had studied',h:'Before past → past perfect'},
+    {t:'choice',q:'I usually ___ up at 7 am.',o:['wake','wakes','woke','am waking'],a:'wake',h:'Usually → present simple'},
+    {t:'choice',q:'___ your brother like football?',o:['Do','Does','Did','Is'],a:'Does',h:'He → Does'},
+    {t:'choice',q:'We ___ dinner when he arrived.',o:['had','have','were having','are having'],a:'were having',h:'When → past continuous'},
+    {t:'choice',q:'She is ___ intelligent ___ her sister.',o:['as ... as','more ... than','the most','so ... that'],a:'as ... as',h:'Equal → as ... as'},
+    {t:'choice',q:'I ___ him three times this week.',o:['see','saw','have seen','am seeing'],a:'have seen',h:'This week → present perfect'},
+    {t:'choice',q:'___ you ever tried sushi?',o:['Do','Did','Have','Are'],a:'Have',h:'Ever → present perfect: Have'},
+    {t:'choice',q:'She ___ to Paris last year.',o:['go','goes','went','has gone'],a:'went',h:'Last year → past simple'},
+    {t:'choice',q:'I ___ working when you called.',o:['am','was','have been','were'],a:'was',h:'When (past) → was -ing'},
+    {t:'choice',q:'He is the ___ player on the team.',o:['good','better','best','well'],a:'best',h:'Superlative → the best'},
+    {t:'choice',q:'We ___ our homework already.',o:['finish','finished','have finished','are finishing'],a:'have finished',h:'Already → present perfect'},
+    {t:'choice',q:'___ it rain yesterday?',o:['Do','Does','Did','Was'],a:'Did',h:'Yesterday → Did'},
+    {t:'choice',q:'She ___ her phone!',o:['lose','lost','has lost','is losing'],a:'has lost',h:'Result now → present perfect'},
+    {t:'choice',q:'I ___ TV when the lights went out.',o:['watch','watched','was watching','am watching'],a:'was watching',h:'When → past continuous'},
+    {t:'choice',q:'This movie is ___ than that one.',o:['interesting','more interesting','most interesting','the most'],a:'more interesting',h:'Long adjective → more'},
+    {t:'choice',q:'They ___ married for 10 years.',o:['are','were','have been','had been'],a:'have been',h:'For + now → present perfect'},
+    {t:'choice',q:'___ you finish the report yesterday?',o:['Do','Does','Did','Have'],a:'Did',h:'Yesterday → Did'},
+    {t:'choice',q:'I ___ never ___ to Japan.',o:['have ... been','did ... go','am ... going','was ... going'],a:'have ... been',h:'Never → present perfect'},
+    {t:'choice',q:'She ___ while I was studying.',o:['sleep','slept','was sleeping','has slept'],a:'was sleeping',h:'While → past continuous'},
+    {t:'choice',q:'This is ___ expensive restaurant in town.',o:['more','most','the most','the more'],a:'the most',h:'Superlative → the most'},
+    {t:'choice',q:'I ___ just ___ breakfast.',o:['have ... eaten','did ... eat','am ... eating','was ... eating'],a:'have ... eaten',h:'Just → present perfect'},
+    {t:'choice',q:'We ___ to the beach last summer.',o:['go','went','have gone','are going'],a:'went',h:'Last summer → past'},
+    {t:'choice',q:'He ___ playing football when it started raining.',o:['is','was','has been','had been'],a:'was',h:'When → past continuous'},
+    {t:'choice',q:'She is ___ student in class.',o:['smart','smarter','smartest','the smartest'],a:'the smartest',h:'Superlative → the -est'},
+    {t:'choice',q:'___ you ever ___ a famous person?',o:['Do ... meet','Did ... meet','Have ... met','Are ... meeting'],a:'Have ... met',h:'Ever → present perfect'},
+    {t:'choice',q:'I ___ my car two years ago.',o:['buy','bought','have bought','am buying'],a:'bought',h:'Two years ago → past'},
+    {t:'choice',q:'They ___ when I arrived.',o:['eat','ate','were eating','have eaten'],a:'were eating',h:'When → past continuous'},
+    {t:'choice',q:'This problem is ___ than I thought.',o:['difficult','more difficult','most difficult','the most'],a:'more difficult',h:'Long adjective → more'},
+    {t:'choice',q:'She ___ three languages.',o:['speak','speaks','spoke','has spoken'],a:'speaks',h:'General fact → present'},
+    {t:'choice',q:'___ they visit you last month?',o:['Do','Does','Did','Have'],a:'Did',h:'Last month → Did'},
+    {t:'builder',q:'Put in order: to / went / I / yesterday / cinema / the',w:['to','went','I','yesterday','cinema','the'],a:['I','went','to','the','cinema','yesterday'],h:'I went to the cinema'},
+    {t:'builder',q:'Put in order: ever / you / Italy / Have / been / to?',w:['ever','you','Italy','Have','been','to?'],a:['Have','you','ever','been','to','Italy?'],h:'Have you ever been to ...?'},
+    {t:'builder',q:'Put in order: is / He / taller / his / than / brother',w:['is','He','taller','his','than','brother'],a:['He','is','taller','than','his','brother'],h:'He is taller than ...'},
+    {t:'builder',q:'Put in order: lived / They / years / five / for / here / have',w:['lived','They','years','five','for','here','have'],a:['They','have','lived','here','for','five','years'],h:'They have lived here for ...'},
+    {t:'builder',q:'Put in order: reading / was / arrived / when / she / I',w:['reading','was','arrived','when','she','I'],a:['She','was','reading','when','I','arrived'],h:'She was reading when I arrived'},
+    {t:'choice',q:'I ___ that movie before.',o:['see','saw','have seen','am seeing'],a:'have seen',h:'Before → present perfect'},
+    {t:'choice',q:'___ she come to the party last night?',o:['Do','Does','Did','Has'],a:'Did',h:'Last night → Did'},
+    {t:'choice',q:'We ___ studying when you called.',o:['are','were','have been','had been'],a:'were',h:'When → past continuous'},
+    {t:'choice',q:'This is ___ interesting story.',o:['a','an','the','—'],a:'the',h:'Specific → the'},
+    {t:'choice',q:'He ___ his homework yet.',o:["doesn't finish","didn't finish","hasn't finished","isn't finishing"],a:"hasn't finished",h:'Yet → hasn\'t (present perfect)'},
+    {t:'choice',q:'I ___ football every weekend.',o:['play','plays','played','am playing'],a:'play',h:'Every → present simple'},
+    {t:'choice',q:'___ it snow yesterday?',o:['Do','Does','Did','Has'],a:'Did',h:'Yesterday → Did'},
+    {t:'choice',q:'She ___ in Paris for three months.',o:['live','lives','has lived','lived'],a:'has lived',h:'For + now → present perfect'},
+    {t:'choice',q:'I ___ sleeping when the alarm rang.',o:['am','was','have been','had been'],a:'was',h:'When → past continuous'},
+    {t:'choice',q:'This is ___ building in the city.',o:['tall','taller','tallest','the tallest'],a:'the tallest',h:'Superlative → the -est'},
+    {t:'choice',q:'___ you see that film yet?',o:['Do','Did','Have','Are'],a:'Have',h:'Yet → Have (present perfect)'},
+    {t:'choice',q:'We ___ to London last week.',o:['go','went','have gone','are going'],a:'went',h:'Last week → past'},
+    {t:'choice',q:'He ___ working at 9 am.',o:['is','was','has been','had been'],a:'was',h:'At (past time) → was'},
+    {t:'choice',q:'She is ___ than her classmates.',o:['young','younger','youngest','the youngest'],a:'younger',h:'Comparative → -er'},
+    {t:'choice',q:'I ___ my wallet.',o:['lose','lost','have lost','am losing'],a:'have lost',h:'Result now → present perfect'},
+    {t:'choice',q:'___ they finish the project?',o:['Do','Did','Have','Are'],a:'Did',h:'General past → Did'},
+    {t:'choice',q:'She ___ cooking when I came home.',o:['is','was','has been','had been'],a:'was',h:'When → past continuous'},
+    {t:'choice',q:'This book is ___ than that one.',o:['good','better','best','the best'],a:'better',h:'Comparative → better'},
+    {t:'choice',q:'We ___ this song many times.',o:['hear','heard','have heard','are hearing'],a:'have heard',h:'Many times → present perfect'},
+    {t:'choice',q:'___ he call you yesterday?',o:['Do','Does','Did','Has'],a:'Did',h:'Yesterday → Did'},
+    {t:'choice',q:'I ___ watching TV at 8 pm.',o:['am','was','have been','had been'],a:'was',h:'At (past) → was'},
+    {t:'choice',q:'She is the ___ singer I know.',o:['talented','more talented','most talented','the most talented'],a:'the most talented',h:'Superlative → the most'},
+  ],
+  intermediate:[
+    {t:'choice',q:'If I ___ you, I would apologise.',o:['am','was','were','had been'],a:'were',h:'Second conditional: were'},
+    {t:'choice',q:'She ___ the report by the time the boss arrives.',o:['will finish','finishes','will have finished','is finishing'],a:'will have finished',h:'By the time → future perfect'},
+    {t:'choice',q:'I wish I ___ more time to travel.',o:['have','had','would have','will have'],a:'had',h:'I wish → past (present wish)'},
+    {t:'choice',q:'The meeting has been ___ until next week.',o:['put off','put up','put in','put on'],a:'put off',h:'Phrasal verb: put off = postpone'},
+    {t:'choice',q:'He denied ___ the money.',o:['to take','taking','take','taken'],a:'taking',h:'deny + -ing'},
+    {t:'choice',q:'By 2030, scientists ___ a cure.',o:['find','will find','will have found','had found'],a:'will have found',h:'By (future) → future perfect'},
+    {t:'choice',q:'She is used to ___ early.',o:['wake','waking','woke','be waking'],a:'waking',h:'be used to + -ing'},
+    {t:'choice',q:'The criminal was ___ to ten years.',o:['sentenced','sentence','sentencing','be sentenced'],a:'sentenced',h:'Passive: was + past participle'},
+    {t:'choice',q:'I would have called if I ___ your number.',o:['know','knew','had known','would know'],a:'had known',h:'Third conditional: had known'},
+    {t:'choice',q:'She suggested ___ a new approach.',o:['to try','trying','try','tried'],a:'trying',h:'suggest + -ing'},
+    {t:'choice',q:'___ the traffic, we arrived on time.',o:['Despite','Although','However','Even though'],a:'Despite',h:'Despite + noun'},
+    {t:'choice',q:'The report ___ by the committee.',o:['was submitted','submitted','has submitted','submits'],a:'was submitted',h:'Passive: was + past participle'},
+    {t:'choice',q:'He ___ working here since 2019.',o:['is','was','has been','had been'],a:'has been',h:'Since → present perfect continuous'},
+    {t:'choice',q:'No sooner ___ than it started raining.',o:['we left','had we left','we had left','did we leave'],a:'had we left',h:'Inversion: had we left'},
+    {t:'choice',q:'___ it rain tomorrow, we will cancel.',o:['Should','Would','Will','Did'],a:'Should',h:'Formal conditional: Should'},
+    {t:'choice',q:'She avoided ___ about the accident.',o:['to talk','talking','talk','talked'],a:'talking',h:'avoid + -ing'},
+    {t:'choice',q:'I ___ have gone if I had known.',o:['will','would','should','can'],a:'would',h:'Third conditional: would have'},
+    {t:'choice',q:'The car needs ___.',o:['to repair','repairing','repair','repaired'],a:'repairing',h:'need + -ing (passive meaning)'},
+    {t:'choice',q:'___ you help me with this?',o:['Will','Would','Should','Can'],a:'Would',h:'Polite request: Would'},
+    {t:'choice',q:'She wishes she ___ speak Chinese.',o:['can','could','will','would'],a:'could',h:'Wish + could (present wish)'},
+    {t:'choice',q:'The book ___ by millions.',o:['read','reads','was read','has read'],a:'was read',h:'Passive: was read'},
+    {t:'choice',q:'I look forward to ___ you.',o:['see','seeing','saw','seen'],a:'seeing',h:'look forward to + -ing'},
+    {t:'choice',q:'___ I were rich, I would travel.',o:['If','When','As','Because'],a:'If',h:'Second conditional: If'},
+    {t:'choice',q:'She enjoys ___ in the morning.',o:['to run','running','run','ran'],a:'running',h:'enjoy + -ing'},
+    {t:'choice',q:'The house ___ built in 1990.',o:['is','was','has been','had been'],a:'was',h:'Past passive: was built'},
+    {t:'choice',q:'I regret ___ him the truth.',o:['to tell','telling','tell','told'],a:'telling',h:'regret + -ing (past action)'},
+    {t:'choice',q:'___ finish on time, we need to hurry.',o:['To','For','In order to','So that'],a:'To',h:'Purpose: To + verb'},
+    {t:'choice',q:'She ___ reading when I arrived.',o:['has been','had been','was','is'],a:'had been',h:'Before past → past perfect continuous'},
+    {t:'choice',q:'I am looking forward to ___ from you.',o:['hear','hearing','heard','to hear'],a:'hearing',h:'look forward to + -ing'},
+    {t:'choice',q:'The project ___ completed next month.',o:['will','will be','would be','is'],a:'will be',h:'Future passive: will be'},
+    {t:'choice',q:'She insisted on ___ the bill.',o:['to pay','paying','pay','paid'],a:'paying',h:'insist on + -ing'},
+    {t:'choice',q:'___ hard, you will pass.',o:['Study','Studying','To study','If study'],a:'Study',h:'Imperative → command'},
+    {t:'choice',q:'I would rather ___ at home.',o:['stay','to stay','staying','stayed'],a:'stay',h:'would rather + base verb'},
+    {t:'choice',q:'The letter ___ written yesterday.',o:['is','was','has been','had been'],a:'was',h:'Past passive: was written'},
+    {t:'choice',q:'She is tired of ___ the same thing.',o:['do','to do','doing','done'],a:'doing',h:'tired of + -ing'},
+    {t:'choice',q:'___ I know, he is absent.',o:['As far as','As long as','As well as','As much as'],a:'As far as',h:'Expression: As far as I know'},
+    {t:'choice',q:'I had better ___ now.',o:['go','to go','going','gone'],a:'go',h:'had better + base verb'},
+    {t:'choice',q:'The window ___ broken by the wind.',o:['is','was','has been','had been'],a:'was',h:'Past passive: was broken'},
+    {t:'choice',q:'She gave up ___ last year.',o:['smoke','to smoke','smoking','smoked'],a:'smoking',h:'give up + -ing'},
+    {t:'choice',q:'___ you were here!',o:['I wish','I hope','I want','I like'],a:'I wish',h:'Regret present: I wish'},
+    {t:'choice',q:'I am interested in ___ languages.',o:['learn','to learn','learning','learned'],a:'learning',h:'interested in + -ing'},
+    {t:'choice',q:'The email ___ sent this morning.',o:['is','was','has been','had been'],a:'was',h:'Past passive: was sent'},
+    {t:'choice',q:'She postponed ___ the decision.',o:['make','to make','making','made'],a:'making',h:'postpone + -ing'},
+    {t:'choice',q:'___ you mind opening the window?',o:['Do','Would','Should','Will'],a:'Would',h:'Polite: Would you mind'},
+    {t:'choice',q:'I succeeded in ___ the exam.',o:['pass','to pass','passing','passed'],a:'passing',h:'succeed in + -ing'},
+    {t:'choice',q:'The cake ___ baked by my mother.',o:['is','was','has been','had been'],a:'was',h:'Past passive: was baked'},
+    {t:'choice',q:'She felt like ___ a walk.',o:['take','to take','taking','took'],a:'taking',h:'feel like + -ing'},
+    {t:'choice',q:'___ harder, you would have passed.',o:['If you study','If you studied','Had you studied','Should you study'],a:'Had you studied',h:'Third conditional inversion'},
+    {t:'choice',q:'I am thinking of ___ a new car.',o:['buy','to buy','buying','bought'],a:'buying',h:'think of + -ing'},
+    {t:'choice',q:'The answer ___ known by everyone.',o:['is','was','has been','had been'],a:'is',h:'Present passive: is known'},
+    {t:'choice',q:'She admitted ___ the mistake.',o:['make','to make','making','made'],a:'making',h:'admit + -ing'},
+    {t:'choice',q:'___ you be so kind as to help?',o:['Will','Would','Should','Can'],a:'Would',h:'Formal: Would you be'},
+    {t:'choice',q:'I appreciate your ___.',o:['help','to help','helping','helped'],a:'helping',h:'appreciate + -ing'},
+    {t:'choice',q:'The song ___ sung beautifully.',o:['is','was','has been','had been'],a:'was',h:'Past passive: was sung'},
+    {t:'choice',q:'She keeps ___ the same mistake.',o:['make','to make','making','made'],a:'making',h:'keep + -ing'},
+    {t:'choice',q:'___ I known, I would have come.',o:['If','Had','Should','Would'],a:'Had',h:'Third conditional inversion: Had'},
+    {t:'choice',q:'I am fond of ___.',o:['read','to read','reading','reads'],a:'reading',h:'fond of + -ing'},
+    {t:'choice',q:'The decision ___ made yesterday.',o:['is','was','has been','had been'],a:'was',h:'Past passive: was made'},
+    {t:'choice',q:'She finished ___ the report.',o:['write','to write','writing','wrote'],a:'writing',h:'finish + -ing'},
+    {t:'choice',q:'___ you arrived earlier, you would have seen him.',o:['If','Had','Should','Would'],a:'Had',h:'Third conditional inversion'},
+    {t:'builder',q:'Put in order: I / were / would / you / if / apologise / I',w:['I','were','would','you','if','apologise','I'],a:['If','I','were','you','I','would','apologise'],h:'If I were you, I would ...'},
+    {t:'builder',q:'Put in order: to / used / is / waking / She / up / early',w:['to','used','is','waking','She','up','early'],a:['She','is','used','to','waking','up','early'],h:'She is used to waking up early'},
+    {t:'builder',q:'Put in order: submitted / report / The / was / committee / by / the',w:['submitted','report','The','was','committee','by','the'],a:['The','report','was','submitted','by','the','committee'],h:'Passive: was submitted by'},
+    {t:'builder',q:'Put in order: been / since / He / has / here / 2019 / working',w:['been','since','He','has','here','2019','working'],a:['He','has','been','working','here','since','2019'],h:'Present perfect continuous'},
+    {t:'builder',q:'Put in order: known / would / I / called / have / had / you / I',w:['known','would','I','called','have','had','you','I'],a:['I','would','have','called','you','if','I','had','known'],h:'Third conditional'},
+  ]
+};
+
+let questions=[],current=0,scores={beginner:[],elementary:[],intermediate:[]};
+let answered=false,builtWords=[],remainingWords=[],selectedChoice=null;
+
+function shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+function startTest(){
+  scores={beginner:[],elementary:[],intermediate:[]};
+  questions=[...shuffle(BANK.beginner).slice(0,5),...shuffle(BANK.elementary).slice(0,5),...shuffle(BANK.intermediate).slice(0,5)];
+  current=0;
+  show('screen-quiz');
+  renderQuestion();
+}
+
+function getLevel(idx){return idx<5?'beginner':idx<10?'elementary':'intermediate';}
+function getLevelLabel(l){return{beginner:'Beginner',elementary:'Elementary',intermediate:'Intermediate'}[l];}
+function getBadge(l){return{beginner:'badge-beginner',elementary:'badge-elementary',intermediate:'badge-intermediate'}[l];}
+
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
+
+function renderQuestion(){
+  const q=questions[current];const level=getLevel(current);
+  answered=false;builtWords=[];selectedChoice=null;
+  remainingWords=q.t==='builder'?shuffle([...q.w]):[];
+  document.getElementById('q-counter').textContent=`Question ${current+1} of ${questions.length}`;
+  document.getElementById('q-level-label').textContent=getLevelLabel(level);
+  document.getElementById('progress-fill').style.width=`${(current/questions.length)*100}%`;
+  document.getElementById('current-level-tag').textContent=getLevelLabel(level);
+  const card=document.getElementById('q-card');
+  const letters=['A','B','C','D'];
+  card.innerHTML=`
+    <div class="q-level-badge ${getBadge(level)}">${getLevelLabel(level)}</div>
+    <div class="q-text">${q.q}</div>
+    ${q.t==='choice'
+      ?`<div class="choices" id="choices">${q.o.map((o,i)=>`<button class="choice" onclick="selectChoice(this,${JSON.stringify(o)})"><span class="choice-letter">${letters[i]}</span>${o}</button>`).join('')}</div>`
+      :`<div class="builder-area" id="builder-area"><span class="builder-empty">Tap words below to build the sentence ↓</span></div><div class="word-bank" id="word-bank"></div>`}
+    <div class="feedback-bar" id="feedback"></div>
+    <div class="q-footer">
+      <div>
+        <button class="hint-btn" onclick="toggleHint()">💡 Hint</button>
+        <div class="hint-text" id="hint-text">${q.h}</div>
+      </div>
+      <button class="check-btn" id="action-btn" onclick="checkAnswer()">Check →</button>
+    </div>`;
+  if(q.t==='builder')updateBuilderUI();
+}
+
+function updateBuilderUI(){
+  const area=document.getElementById('builder-area');
+  const bank=document.getElementById('word-bank');
+  if(!area||!bank)return;
+  area.innerHTML=builtWords.length?builtWords.map((w,i)=>`<span class="wchip in-builder" onclick="removeFromBuilder(${i})">${w}</span>`).join(''):`<span class="builder-empty">Tap words below to build the sentence ↓</span>`;
+  bank.innerHTML=remainingWords.map((w,i)=>`<span class="wchip" onclick="addToBuilder(${i})">${w}</span>`).join('');
+}
+
+function addToBuilder(i){if(answered)return;builtWords.push(remainingWords[i]);remainingWords.splice(i,1);updateBuilderUI();}
+function removeFromBuilder(i){if(answered)return;remainingWords.push(builtWords[i]);builtWords.splice(i,1);updateBuilderUI();}
+function selectChoice(el,val){if(answered)return;selectedChoice=val;document.querySelectorAll('.choice').forEach(c=>c.classList.remove('selected'));el.classList.add('selected');}
+function toggleHint(){const h=document.getElementById('hint-text');h.style.display=h.style.display==='block'?'none':'block';}
+
+function checkAnswer(){
+  if(answered){nextQuestion();return;}
+  const q=questions[current];const level=getLevel(current);let correct=false;
+  if(q.t==='choice'){
+    if(!selectedChoice)return;
+    correct=selectedChoice===q.a;
+    document.querySelectorAll('.choice').forEach(c=>{
+      const txt=c.textContent.trim().replace(/^[ABCD]/,'').trim();
+      if(txt===q.a)c.classList.add('correct');
+      else if(txt===selectedChoice&&!correct)c.classList.add('wrong');
+      c.onclick=null;
+    });
+  } else {
+    if(!builtWords.length)return;
+    correct=builtWords.join(' ')===q.a.join(' ');
+  }
+  scores[level].push(correct?1:0);answered=true;
+  const fb=document.getElementById('feedback');
+  fb.style.display='block';fb.className='feedback-bar '+(correct?'ok':'err');
+  fb.textContent=correct?'✓ Correct! Well done.':'✗ Not quite. Correct: '+(q.t==='choice'?q.a:q.a.join(' '));
+  const btn=document.getElementById('action-btn');
+  btn.textContent=current<questions.length-1?'Next →':'See results →';
+  btn.className='next-btn';
+}
+
+function nextQuestion(){current++;if(current>=questions.length){showResults();return;}renderQuestion();}
+
+function showResults(){
+  const bS=scores.beginner.reduce((a,b)=>a+b,0);
+  const eS=scores.elementary.reduce((a,b)=>a+b,0);
+  const iS=scores.intermediate.reduce((a,b)=>a+b,0);
+  const total=bS+eS+iS;const pct=Math.round((total/questions.length)*100);
+  let lvl,desc,color;
+  if(pct>=80){lvl='Intermediate';color='#6C63FF';desc='Excellent! You handle complex grammar and structures confidently. You are ready for upper-intermediate study and real English conversations.';}
+  else if(pct>=50){lvl='Elementary';color='#B5838D';desc='Good foundation! You know the basics and can handle everyday English. Focus on past tenses, questions, and vocabulary expansion.';}
+  else{lvl='Beginner';color='#2D6A4F';desc='You are at the start — and that is fine! Focus on core vocabulary, present tense, and simple sentences to build a strong foundation.';}
+  show('screen-results');
+  document.getElementById('current-level-tag').textContent=lvl;
+  document.getElementById('progress-fill').style.width='100%';
+  const bP=Math.round((bS/5)*100),eP=Math.round((eS/5)*100),iP=Math.round((iS/5)*100);
+  document.getElementById('result-card').innerHTML=`
+    <div style="font-size:12px;color:var(--ink3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.75rem;font-weight:600">Your level</div>
+    <div class="result-level-name" style="color:${color}">${lvl}</div>
+    <div class="result-score">${total} correct out of ${questions.length} · ${pct}%</div>
+    <div class="bar-chart">
+      <div class="bar-row"><div class="bar-row-label">🌱 Beginner</div><div class="bar-track"><div class="bar-fill" style="width:${bP}%;background:#52B788"></div></div><div class="bar-pct" style="color:#2D6A4F">${bP}%</div></div>
+      <div class="bar-row"><div class="bar-row-label">📖 Elementary</div><div class="bar-track"><div class="bar-fill" style="width:${eP}%;background:#B5838D"></div></div><div class="bar-pct" style="color:#B5838D">${eP}%</div></div>
+      <div class="bar-row"><div class="bar-row-label">🚀 Intermediate</div><div class="bar-track"><div class="bar-fill" style="width:${iP}%;background:#6C63FF"></div></div><div class="bar-pct" style="color:#6C63FF">${iP}%</div></div>
+    </div>
+    <div class="result-desc">${desc}</div>
+    <button class="restart-btn" onclick="startTest()">Try again with new questions ↺</button>`;
+}
+</script>
+</body>
+</html>
